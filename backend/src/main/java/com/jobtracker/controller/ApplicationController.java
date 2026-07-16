@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/applications")
-@CrossOrigin(origins = "http://localhost:5173") // Vite's default dev port
+@CrossOrigin(origins = "http://localhost:5173")
 public class ApplicationController {
 
     private final ApplicationService service;

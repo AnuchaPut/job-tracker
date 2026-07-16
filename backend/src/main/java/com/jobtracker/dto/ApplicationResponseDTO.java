@@ -8,8 +8,6 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-// What the client RECEIVES back. Never return the entity directly —
-// this is where you'd add computed fields (like interviews[]) later without touching the DB layer.
 @Getter
 @Setter
 public class ApplicationResponseDTO {

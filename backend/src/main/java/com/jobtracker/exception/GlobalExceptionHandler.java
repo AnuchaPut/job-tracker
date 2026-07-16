@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-// Central place for turning exceptions into clean JSON error responses,
-// instead of leaking Java stack traces to the client.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

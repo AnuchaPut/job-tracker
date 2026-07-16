@@ -7,8 +7,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-// What the client SENDS to create/update an application.
-// Kept separate from the entity so the API shape can evolve independently of the DB.
 @Getter
 @Setter
 public class ApplicationRequestDTO {
