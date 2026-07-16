@@ -36,4 +36,37 @@ public class GlobalExceptionHandler {
         body.put("fieldErrors", errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map <String, String>> userAlreadyExists(UserAlreadyExistsException ex) {
+        Map<String , String> errors = new HashMap<>();
+
+        errors.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(
+                errors,
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(BadCredentialException.class)
+    public ResponseEntity<Map <String, String>> handleBadCredentials(BadCredentialException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Invalid email or password");
+
+        return new ResponseEntity<>(
+                errors,
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleException(Exception ex) {
+
+        Map<String, String> body = new HashMap<>();
+        body.put("error", "Something went wrong");
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

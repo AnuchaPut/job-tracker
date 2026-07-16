@@ -2,7 +2,6 @@ package com.jobtracker.security;
 
 import com.jobtracker.model.User;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 
