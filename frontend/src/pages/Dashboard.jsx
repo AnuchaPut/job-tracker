@@ -27,7 +27,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter])
 
   async function handleDelete(id) {

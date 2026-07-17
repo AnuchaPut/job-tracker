@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// Business logic lives here, not in the controller.
-// Controller = HTTP concerns. Service = actual logic. Repository = DB access.
 @Service
 public class ApplicationService {
 

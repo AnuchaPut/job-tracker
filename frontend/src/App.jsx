@@ -3,16 +3,31 @@ import Dashboard from './pages/Dashboard'
 import ApplicationForm from './pages/ApplicationForm'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import  ProtectedRoute  from './security/ProtectedRoute'
+import Navbar from './pages/Navbar'
 
 export default function App() {
   return (
     <BrowserRouter>
+     <Navbar />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/new" element={<ApplicationForm />} />
-        <Route path="/edit/:id" element={<ApplicationForm />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+         <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/new" element={
+          <ProtectedRoute>
+            <ApplicationForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/edit/:id" element={
+          <ProtectedRoute>
+            <ApplicationForm />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )

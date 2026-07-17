@@ -3,7 +3,6 @@ package com.jobtracker.controller;
 import com.jobtracker.dto.LoginResponse;
 import com.jobtracker.dto.UserRequest;
 import com.jobtracker.dto.UserResponse;
-import com.jobtracker.repository.UserRepository;
 import com.jobtracker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +13,10 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService service;
-    private final UserRepository userRepository;
-
-    public AuthController(UserService service, UserRepository userRepository) {
+    
+    public AuthController(UserService service) {
         this.service = service;
-        this.userRepository = userRepository;
+     
     }
 
     @PostMapping("/register")
