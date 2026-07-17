@@ -1,6 +1,8 @@
 package com.jobtracker.dto;
 
 import com.jobtracker.model.ApplicationStatus;
+
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

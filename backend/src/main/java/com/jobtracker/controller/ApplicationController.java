@@ -8,6 +8,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import com.jobtracker.model.User;
+import com.jobtracker.repository.UserRepository;
 
 import java.util.List;
 
@@ -17,17 +21,24 @@ import java.util.List;
 public class ApplicationController {
 
     private final ApplicationService service;
+    private final UserRepository userRepository;
 
-    public ApplicationController(ApplicationService service) {
+    public ApplicationController(ApplicationService service, UserRepository userRepository) {
         this.service = service;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
-    public List<ApplicationResponseDTO> getAll(@RequestParam(required = false) ApplicationStatus status) {
+    public List<ApplicationResponseDTO> getAll(@RequestParam(required = false) ApplicationStatus status, @AuthenticationPrincipal UserDetails userDetails) {
+
+         User user = userRepository
+            .findByEmail(userDetails.getUsername())
+            .orElseThrow();
+
         if (status != null) {
-            return service.getByStatus(status);
+            return service.getByStatus(status, user);
         }
-        return service.getAll();
+        return service.getAll(user);
     }
 
     @GetMapping("/{id}")
@@ -37,8 +48,11 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationResponseDTO create(@Valid @RequestBody ApplicationRequestDTO dto) {
-        return service.create(dto);
+    public ApplicationResponseDTO create(@Valid @RequestBody ApplicationRequestDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return service.create(dto, user);
     }
 
     @PutMapping("/{id}")

@@ -7,7 +7,7 @@ import com.jobtracker.model.Application;
 import com.jobtracker.model.ApplicationStatus;
 import com.jobtracker.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
-
+import com.jobtracker.model.User; 
 import java.util.List;
 
 @Service
@@ -19,15 +19,15 @@ public class ApplicationService {
         this.repository = repository;
     }
 
-    public List<ApplicationResponseDTO> getAll() {
-        return repository.findAll()
+    public List<ApplicationResponseDTO> getAll(User user) {
+        return repository.findByUser(user)
                 .stream()
                 .map(ApplicationResponseDTO::fromEntity)
                 .toList();
     }
 
-    public List<ApplicationResponseDTO> getByStatus(ApplicationStatus status) {
-        return repository.findByStatus(status)
+    public List<ApplicationResponseDTO> getByStatus(ApplicationStatus status, User user) {
+        return repository.findByUserAndStatus(user, status)
                 .stream()
                 .map(ApplicationResponseDTO::fromEntity)
                 .toList();
@@ -38,9 +38,10 @@ public class ApplicationService {
         return ApplicationResponseDTO.fromEntity(app);
     }
 
-    public ApplicationResponseDTO create(ApplicationRequestDTO dto) {
+    public ApplicationResponseDTO create(ApplicationRequestDTO dto, User user) {
         Application app = new Application();
         applyDtoToEntity(dto, app);
+        app.setUser(user);
         Application saved = repository.save(app);
         return ApplicationResponseDTO.fromEntity(saved);
     }

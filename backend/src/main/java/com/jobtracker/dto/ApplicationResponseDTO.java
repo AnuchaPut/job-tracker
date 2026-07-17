@@ -2,6 +2,8 @@ package com.jobtracker.dto;
 
 import com.jobtracker.model.Application;
 import com.jobtracker.model.ApplicationStatus;
+
+
 import lombok.Getter;
 import lombok.Setter;
 

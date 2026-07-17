@@ -1,10 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-    baseURL: "http://localhost:8080/api",
-    headers: {
-        "Content-Type": "application/json"
-    }
+    baseURL: "http://localhost:8080"
 });
 
 
@@ -17,11 +14,15 @@ axiosClient.interceptors.request.use(
             config.headers.Authorization = `Bearer ${token}`;
         }
 
+        config.headers["Content-Type"] = "application/json";
+
         return config;
     },
+
     (error) => {
         return Promise.reject(error);
     }
 );
+
 
 export { axiosClient };
