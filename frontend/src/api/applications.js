@@ -1,6 +1,6 @@
 import { axiosClient } from './axiosClient'
 
-const BASE_URL = 'http://localhost:8080/api/applications'
+const BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/applications`
 
 async function handleResponse(res) {
   return res.data
