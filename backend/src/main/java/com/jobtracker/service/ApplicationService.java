@@ -33,8 +33,8 @@ public class ApplicationService {
                 .toList();
     }
 
-    public ApplicationResponseDTO getById(Long id) {
-        Application app = findOrThrow(id);
+    public ApplicationResponseDTO getById(Long id, User user) {
+        Application app = findOrThrow(id, user);
         return ApplicationResponseDTO.fromEntity(app);
     }
 
@@ -46,20 +46,20 @@ public class ApplicationService {
         return ApplicationResponseDTO.fromEntity(saved);
     }
 
-    public ApplicationResponseDTO update(Long id, ApplicationRequestDTO dto) {
-        Application app = findOrThrow(id);
+    public ApplicationResponseDTO update(Long id, ApplicationRequestDTO dto, User user) {
+        Application app = findOrThrow(id, user);
         applyDtoToEntity(dto, app);
         Application saved = repository.save(app);
         return ApplicationResponseDTO.fromEntity(saved);
     }
 
-    public void delete(Long id) {
-        Application app = findOrThrow(id);
+    public void delete(Long id, User user) {
+        Application app = findOrThrow(id, user);
         repository.delete(app);
     }
 
-    private Application findOrThrow(Long id) {
-        return repository.findById(id)
+    private Application findOrThrow(Long id, User user) {
+        return repository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found with id " + id));
     }
 

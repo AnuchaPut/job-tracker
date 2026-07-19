@@ -42,8 +42,10 @@ public class ApplicationController {
     }
 
     @GetMapping("/{id}")
-    public ApplicationResponseDTO getById(@PathVariable Long id) {
-        return service.getById(id);
+    public ApplicationResponseDTO getById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return service.getById(id, user);
     }
 
     @PostMapping
@@ -56,13 +58,17 @@ public class ApplicationController {
     }
 
     @PutMapping("/{id}")
-    public ApplicationResponseDTO update(@PathVariable Long id, @Valid @RequestBody ApplicationRequestDTO dto) {
-        return service.update(id, dto);
+    public ApplicationResponseDTO update(@PathVariable Long id, @Valid @RequestBody ApplicationRequestDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return service.update(id, dto, user);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        service.delete(id, user);
         return ResponseEntity.noContent().build();
     }
 }
