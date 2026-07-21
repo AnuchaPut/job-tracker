@@ -1,39 +1,80 @@
-# Job Application Tracker — Starter
+# Job Tracker
 
-This is a deliberately minimal, working full-stack app: React frontend + Spring Boot
-backend + PostgreSQL. It covers CRUD only — Weeks 1-3 of the study plan. Everything
-after that (interviews, auth, filtering, deployment) you add into THIS project as you
-learn it. Don't start a new repo.
+A full-stack job application tracker with JWT authentication, ownership-based
+authorization, and a polished React dashboard — built and deployed end-to-end.
 
-## What's already here
-- Backend: Spring Boot REST API for `Application` (CRUD), DTOs, global exception handling
-- Frontend: React (Vite) with a dashboard, add/edit form, status filter, status badges
-- Tailwind CSS wired up with a small custom palette (see `tailwind.config.js`)
+**Live demo:** https://job-tracker-pink-alpha.vercel.app
 
-## What's NOT here yet (add these as you learn them — see the study plan)
-- `interviews` table/entity (Week 4)
-- Flyway/Liquibase migrations (Week 4) — right now Hibernate auto-creates tables, which is fine for local dev only
-- Auth / JWT / login / protected routes (Week 5)
-- Deadline reminders / kanban board (Week 6)
-- Docker + deployment config (Week 7)
-- Tests (Week 6/8)
+## Features
+
+- **Auth** — register/login with JWT, passwords hashed with BCrypt
+- **Ownership-based authorization** — every application record is scoped to
+  its owner; users can only view, edit, or delete their own data (see
+  [Security](#security) below)
+- **Application tracking** — create, edit, delete, and filter applications by
+  status (Applied / Interviewing / Offer / Rejected)
+- **Dashboard statistics** — live counts by status
+- **Search** — filter by company or role
+- **Polished UX** — toast notifications, delete confirmation, empty states,
+  responsive navbar with profile dropdown
+- **Client-side validation** — email format, password strength, confirm-password
+  match, with specific (not generic) error messages from the API
+
+## Tech stack
+
+**Backend:** Java 17, Spring Boot 3.3.2, Spring Security, Spring Data JPA,
+PostgreSQL, JWT (jjwt), Maven, Docker
+
+**Frontend:** React (Vite), React Router, Axios, Tailwind CSS, react-hot-toast
+
+**Testing:** JUnit 5, MockMvc, H2 
+
+**Deployment:** Backend on Render (Docker container), database on Render
+(PostgreSQL), frontend on Vercel
+
+## Security
+
+The core of this project is a real, deliberately-introduced-then-fixed IDOR
+(Insecure Direct Object Reference) vulnerability:
+
+- Every `GET`, `PUT`, and `DELETE` on `/api/applications/{id}` is scoped by
+  both `id` **and** the authenticated user (`findByIdAndUser`), not `id` alone
+- Accessing another user's application returns `404`, not `403` — so a bad
+  actor can't tell the difference between "doesn't exist" and "not yours"
+- Verified manually across all ownership scenarios (owner, non-owner,
+  unauthenticated, non-existent ID) and covered by an automated integration
+  test suite (`ApplicationControllerIntegrationTest`) that runs against an
+  isolated H2 database, not production data
+
+## Architecture
+
+```
+┌─────────────┐        HTTPS         ┌──────────────────┐        JDBC        ┌──────────────┐
+│   React     │ ───────────────────► │   Spring Boot     │ ─────────────────► │  PostgreSQL  │
+│  (Vercel)   │ ◄─────────────────── │   (Render/Docker)  │ ◄───────────────── │   (Render)   │
+└─────────────┘      JSON + JWT      └──────────────────┘                     └──────────────┘
+```
+
+- Frontend calls the backend with a JWT bearer token attached after login
+- `JwtFilter` validates the token on every request before it reaches a controller
+- Spring Security enforces role-based access (`USER` / `ADMIN`) and CORS
+- Ownership checks happen at the repository query level, not just in the controller
 
 ## Running it locally
 
 ### 1. Database
-Create a local Postgres database:
 ```bash
 createdb job_tracker
 ```
-Default connection in `backend/src/main/resources/application.properties` assumes
-user `postgres` / password `postgres` on `localhost:5432`. Adjust if yours differs.
+Default connection assumes `postgres` / your local password on `localhost:5432` —
+adjust in `backend/src/main/resources/application.properties` if needed.
 
 ### 2. Backend
 ```bash
 cd backend
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
-Runs on `http://localhost:8080`. Tables are auto-created from the entities on first run.
+Runs on `http://localhost:8080`. Tables auto-create from entities on first run.
 
 ### 3. Frontend
 ```bash
@@ -43,45 +84,55 @@ npm run dev
 ```
 Runs on `http://localhost:5173`.
 
-Open that URL — you should see an empty dashboard with an "Add Application" button.
+### Environment variables
+
+Backend (`application.properties` reads these, with local fallbacks):
+```
+DATABASE_URL, DB_USERNAME, DB_PASSWORD, JWT_SECRET, JWT_EXPIRATION
+```
+
+Frontend (`.env`):
+```
+VITE_API_URL=http://localhost:8080
+```
+
+## Running the tests
+
+```bash
+cd backend
+mvn test
+```
+Integration tests spin up the full Spring context against an isolated H2
+database (see `application-test.properties`) — no risk to real data.
 
 ## Project structure
+
 ```
 backend/
   src/main/java/com/jobtracker/
-    model/         → JPA entities
-    repository/     → Spring Data JPA repositories
-    dto/           → Request/response DTOs (never expose entities directly)
-    service/       → business logic
+    model/         → JPA entities (User, Application)
+    repository/     → Spring Data JPA repositories, ownership-scoped queries
+    dto/           → request/response DTOs (entities never exposed directly)
+    service/       → business logic, ownership enforcement
     controller/    → REST endpoints
+    security/      → JWT filter, Spring Security config, CORS
     exception/     → global error handling
+  src/test/java/    → integration tests
+  Dockerfile
 frontend/
   src/
-    api/           → all backend calls go through here
-    pages/         → Dashboard, ApplicationForm
-    components/    → StatusBadge, and anything you add later
+    api/           → all backend calls
+    auth/          → login/register service calls
+    pages/         → Dashboard, Login, Register, application forms
+    components/    → Navbar, StatusBadge, StatCard
 ```
 
-## How to extend it (matches the 8-week plan)
+## Deployment
 
-**Week 4 — Interviews + migrations**
-Add an `Interview` entity related to `Application` (`@ManyToOne`), a repository,
-service methods, and endpoints under `/api/applications/{id}/interviews`. Add Flyway
-and write your first migration instead of relying on `ddl-auto=update`.
-
-**Week 5 — Auth**
-Add a `User` entity, Spring Security config, JWT filter, `/api/auth/register` and
-`/api/auth/login`. Relate `Application` to `User` so each user only sees their own
-rows. On the frontend: login/register pages, store the token, add a route guard.
-
-**Week 6 — Non-trivial feature**
-Pick one: kanban-style drag-and-drop status board, deadline reminders (flag stale
-applications), or combined search+filter. Don't do all three.
-
-**Week 7 — Deploy**
-Dockerize the backend. Deploy frontend to Vercel/Netlify, backend + Postgres to
-Render/Railway. Update the frontend's `BASE_URL` in `src/api/applications.js` to
-point at the deployed backend.
-
-Keep adding to this same repo. When every box in the "Definition of done" list from
-the build spec is checked, it's finished — move on to interview prep, not to a new project.
+- **Backend:** Dockerized Spring Boot app on Render, built via a multi-stage
+  Dockerfile (Maven build → lightweight JRE runtime image)
+- **Database:** managed PostgreSQL on Render
+- **Frontend:** Vite build deployed on Vercel, with SPA rewrites configured
+  for client-side routing
+- Secrets (DB credentials, JWT secret) are injected via environment
+  variables on each platform — never committed to the repo
