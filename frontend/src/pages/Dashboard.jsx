@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getApplications, deleteApplication } from '../api/applications'
 import StatusBadge from '../components/StatusBadge'
+import StatCard from '../components/StatCard'
 import { toast } from 'react-hot-toast'
 
 const STATUS_FILTERS = ['ALL', 'APPLIED', 'INTERVIEWING', 'OFFER', 'REJECTED']
@@ -9,6 +10,7 @@ const STATUS_FILTERS = ['ALL', 'APPLIED', 'INTERVIEWING', 'OFFER', 'REJECTED']
 export default function Dashboard() {
   const [applications, setApplications] = useState([])
   const [filter, setFilter] = useState('ALL')
+  const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -41,6 +43,19 @@ export default function Dashboard() {
     }
   }
 
+  const stats = {
+    total: applications.length,
+    applied: applications.filter(a => a.status === 'APPLIED').length,
+    interviewing: applications.filter(a => a.status === 'INTERVIEWING').length,
+    offer: applications.filter(a => a.status === 'OFFER').length,
+    rejected: applications.filter(a => a.status === 'REJECTED').length,
+  }
+
+  const filteredApplications = applications.filter(app =>
+    app.company.toLowerCase().includes(search.toLowerCase()) ||
+    app.role.toLowerCase().includes(search.toLowerCase())
+  )
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -53,7 +68,17 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      {filter === 'ALL' && !loading && !error && (
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+          <StatCard label="Total" value={stats.total} />
+          <StatCard label="Applied" value={stats.applied} />
+          <StatCard label="Interviewing" value={stats.interviewing} />
+          <StatCard label="Offers" value={stats.offer} />
+          <StatCard label="Rejected" value={stats.rejected} />
+        </div>
+      )}
+
+      <div className="flex gap-2 mb-4">
         {STATUS_FILTERS.map((s) => (
           <button
             key={s}
@@ -69,6 +94,14 @@ export default function Dashboard() {
         ))}
       </div>
 
+      <input
+        type="text"
+        placeholder="Search by company or role..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full mb-6 px-3 py-2 border border-gray-200 rounded-md text-sm"
+      />
+
       {loading && <p className="text-gray-500 text-sm">Loading…</p>}
       {error && (
         <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md px-3 py-2">
@@ -76,10 +109,14 @@ export default function Dashboard() {
         </p>
       )}
 
-      {!loading && !error && applications.length === 0 && (
+      {!loading && !error && filteredApplications.length === 0 && (
         <div className="text-center py-16 text-gray-500">
           <p className="mb-3">
-            {filter === 'ALL' ? 'No applications yet.' : `No applications with status "${filter.charAt(0) + filter.slice(1).toLowerCase()}".`}
+            {search
+              ? `No applications matching "${search}".`
+              : filter === 'ALL'
+              ? 'No applications yet.'
+              : `No applications with status "${filter.charAt(0) + filter.slice(1).toLowerCase()}".`}
           </p>
           <Link to="/new" className="text-primary-500 font-medium hover:underline">
             Add your first one
@@ -87,7 +124,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {!loading && applications.length > 0 && (
+      {!loading && filteredApplications.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500 text-left">
@@ -100,7 +137,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {applications.map((app) => (
+              {filteredApplications.map((app) => (
                 <tr key={app.id} className="border-t border-gray-100 hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium">{app.company}</td>
                   <td className="px-4 py-3 text-gray-600">{app.role}</td>

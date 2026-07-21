@@ -40,7 +40,7 @@ export default function RegisterPage() {
             const token = response.data.token;
             localStorage.setItem('token', token);
             toast.success('Account created successfully!');
-            navigate('/dashboard');
+            navigate('/');
         } catch (err) {
             if (err.response?.status === 409) {
                 toast.error('An account with this email already exists');
