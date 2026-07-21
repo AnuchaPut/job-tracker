@@ -19,7 +19,13 @@ export default function LoginPage() {
             toast.success('Logged in successfully');
             navigate('/');
         } catch (err) {
-            toast.error("Invalid email or password")
+            if (err.response?.status === 401 || err.response.status === 409) {
+                toast.error('Invalid email or password');
+            } else if (!err.response) {
+                toast.error('Cannot reach server. Please try again');
+            } else {
+                 toast.error('Something went wrong. Please try again.');
+            }
         }
     };
 
