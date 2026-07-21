@@ -44,7 +44,7 @@ export default function ApplicationForm() {
       } else {
         await createApplication(form)
       }
-      navigate('/dashboard')
+      navigate('/')
     } catch (err) {
       setError(err.message)
       setSaving(false)
@@ -131,7 +131,7 @@ export default function ApplicationForm() {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="text-gray-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100"
           >
             Cancel

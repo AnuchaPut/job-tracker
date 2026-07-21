@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getApplications, deleteApplication } from '../api/applications'
 import StatusBadge from '../components/StatusBadge'
+import { toast } from 'react-hot-toast'
 
 const STATUS_FILTERS = ['ALL', 'APPLIED', 'INTERVIEWING', 'OFFER', 'REJECTED']
 
@@ -31,8 +32,13 @@ export default function Dashboard() {
 
   async function handleDelete(id) {
     if (!confirm('Delete this application?')) return
-    await deleteApplication(id)
-    load()
+    try {
+      await deleteApplication(id)
+      toast.success("Application deleted");
+      load()
+    } catch (err) {
+      toast.error("Failed to delete application")
+    }
   }
 
   return (
