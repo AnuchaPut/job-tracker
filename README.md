@@ -5,6 +5,25 @@ authorization, and a polished React dashboard — built and deployed end-to-end.
 
 **Live demo:** https://job-tracker-pink-alpha.vercel.app
 
+> ⚠️ The backend runs on Render's free tier, which spins down after inactivity.
+> The first request may take 30-60 seconds to wake it up — subsequent requests are fast.
+
+## Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Login
+![Login](screenshots/login.png)
+
+### Empty state
+![Empty state](screenshots/empty-state.png)
+
+### Add application
+![Add application](screenshots/add-application.png)
+
+![Demo](screenshots/demo.gif)
+
 ## Features
 
 - **Auth** — register/login with JWT, passwords hashed with BCrypt
