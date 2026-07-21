@@ -6,10 +6,14 @@ import RegisterPage from './pages/RegisterPage'
 import  ProtectedRoute  from './security/ProtectedRoute'
 import Navbar from './pages/Navbar'
 import MainLayouts from './layouts/MainLayouts'
+import { Toaster } from 'react-hot-toast'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <>
+      <Toaster position='top-right'/>
+
+      <BrowserRouter>
       <Routes>
 
         <Route path="/login" element={<LoginPage />} />
@@ -17,7 +21,7 @@ export default function App() {
         
         <Route element={<MainLayouts />}>
 
-          <Route path="/dashboard" element={
+          <Route path="/" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
@@ -41,5 +45,7 @@ export default function App() {
   
       </Routes>
     </BrowserRouter>
+    </>
+
   )
 }

@@ -18,7 +18,7 @@ export default function RegisterPage() {
         await register(username, email, password);
         const token = await login(email, password);
         localStorage.setItem('token', token);
-        navigate('/dashboard');
+        navigate('/');
     };
 
     return (
