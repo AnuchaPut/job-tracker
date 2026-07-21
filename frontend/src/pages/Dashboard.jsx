@@ -78,7 +78,9 @@ export default function Dashboard() {
 
       {!loading && !error && applications.length === 0 && (
         <div className="text-center py-16 text-gray-500">
-          <p className="mb-3">No applications yet.</p>
+          <p className="mb-3">
+            {filter === 'ALL' ? 'No applications yet.' : `No applications with status "${filter.charAt(0) + filter.slice(1).toLowerCase()}".`}
+          </p>
           <Link to="/new" className="text-primary-500 font-medium hover:underline">
             Add your first one
           </Link>
